@@ -1,0 +1,25 @@
+{
+  "name": "boilerplate",
+  "version": "1.0.0",
+  "description": "This is a node boilerplate ",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/munichlinux/boilerplate.git"
+  },
+  "keywords": [
+    "boilerplate",
+    "io.js",
+    "node",
+    "framework"
+  ],
+  "author": "Prashanth <munichlinux@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/munichlinux/boilerplate/issues"
+  },
+  "homepage": "https://github.com/munichlinux/boilerplate#readme"
+}
