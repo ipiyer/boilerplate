@@ -5,6 +5,7 @@ var gulp = require('gulp'),
   through = require('through'),
   gutil = require('gulp-util'),
   plugins = gulpLoadPlugins(),
+  compass = require("gulp-compass"),
   paths = {
     js: ['*.js', 'test/**/*.js', '!node_modules/**', 'app/{controllers,models,routes}.js', 'lib/**', 'utils/**/*.js'],
     templates: ['app/views/**/*.hbs'],
@@ -12,8 +13,21 @@ var gulp = require('gulp'),
     sass: ['public/css/sass/*.scss'],
   };
 
-var defaultTasks = ['clean', 'jshint', 'sass', 'serve', 'watch'];
-console.log(JSON.stringify(plugins));
+var defaultTasks = ['clean', 'jshint', 'sass', 'serve', 'watch', 'compass'];
+
+
+gulp.task('compass', function() {
+  gulp.src(paths.sass)
+    .pipe(compass({
+      css: 'public/css',
+      sass: 'public/css/sass',
+      image: 'public/img',
+      import_path: ["public/components/bootstrap-sass/assets/stylesheets/bootstrap", "public/css/sass_includes"],
+      generated_images_path: 'public/img'
+    }))
+});
+
+
 gulp.task('env:development', function() {
   process.env.NODE_ENV = 'development';
 });

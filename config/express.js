@@ -7,7 +7,10 @@ var logger = require("morgan"),
     express = require("express");
 
 var routes = require("../apps/routes/all"),
-    config = require("./env/all");
+    config = require("./env/all"),
+    Handlebars = require("handlebars");
+
+
 
 module.exports = function(app) {
     app.set('views', path.join(config.root, 'apps', 'views'));
@@ -22,6 +25,12 @@ module.exports = function(app) {
     }));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
+
+    var Hbsc = require("express-hbsc")(app, Handlebars);
+
+    app.engine('hbs', function(view, context, cb) {
+        Hbsc.render(view, context, cb);
+    });
 
     // init routes; routes should be above 404;
     require("../apps/routes/all")(app);

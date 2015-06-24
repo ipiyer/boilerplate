@@ -1,0 +1,33 @@
+{
+  "name": "Boilerplate",
+  "version": "0.1",
+  "authors": [
+    "Prashanth <munichlinux@gmail.com>"
+  ],
+  "description": "ExpressJS boilerplate",
+  "private": true,
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "backbone": "~1.2.1",
+    "bootstrap": "~3.3.5",
+    "handlebars": "~3.0.3",
+    "json3": "~3.3.2",
+    "bootstrap-sass": "~3.3.5",
+    "font-awesome": "~4.3.0",
+    "bootstrap-sass-official": "~3.3.5"
+  },
+  "install": {
+    "path": {
+      "js": "public/js/vendors",
+      "css": "public/css/vendors",
+      "(scss|less|sass)$": "public/css/sass_lib",
+      "/(woff2|eot|otf|woff|otf|ttf|svg)$/": "public/font"
+    },
+    "sources": {
+      "backbone": "bower_components/backbone/backbone.js",
+      "underscore": "bower_components/underscore/underscore.js",
+      "handlebars": "bower_components/handlebars/handlebars.js",
+      "bootstrap-sass-official": "bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/**"
+    }
+  }
+}
