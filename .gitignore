@@ -26,5 +26,6 @@ public/css/*.css
 public/js/vendors
 public/js/templates
 public/css/vendors
+public/bower_components
 public/components
 public/font/font-awesome

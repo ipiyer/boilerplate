@@ -2,19 +2,33 @@
 
 var gulp = require('gulp'),
   gulpLoadPlugins = require('gulp-load-plugins'),
-  through = require('through'),
+  through = require('through2'),
   gutil = require('gulp-util'),
   plugins = gulpLoadPlugins(),
+
   compass = require("gulp-compass"),
   paths = {
-    js: ['*.js', 'test/**/*.js', '!node_modules/**', 'app/{controllers,models,routes}.js', 'lib/**', 'utils/**/*.js'],
-    templates: ['app/views/**/*.hbs'],
+    js: ['./*.js', '!node_modules/**', '!public/js/**',
+      'config/**/*.js', 'apps/{controllers,middleware,models,routes}/**/*.js',
+      'lib/**', 'utils/**/*.js'
+    ],
+    staticJS: ['public/js/*.js'],
+    unitTest: ['test/unit/**/*.js'],
+    templates: ['apps/views/**/*.hbs'],
+    cssDir: ['public/css'],
     css: ['public/css/*.css'],
-    sass: ['public/css/sass/*.scss'],
-  };
+    webComponents: ['public/elements/*.html'],
+    sass: ["public/css/sass/*.scss"],
+    sass_includes: ["public/css/sass_includes",
+      "public/bower_components/bootstrap/scss",
+      "public/bower_components/bootstrap/scss/mixins",
+      "public/bower_components/font-awesome/scss"
+    ]
+  },
+  config = require("./config/config"),
+  path = require("path");
 
-var defaultTasks = ['clean', 'jshint', 'sass', 'serve', 'watch', 'compass'];
-
+var defaultTasks = ['clean', 'serve', 'watch', 'compass'];
 
 gulp.task('compass', function() {
   gulp.src(paths.sass)
@@ -22,67 +36,93 @@ gulp.task('compass', function() {
       css: 'public/css',
       sass: 'public/css/sass',
       image: 'public/img',
-      import_path: ["public/components/bootstrap-sass/assets/stylesheets/bootstrap", "public/css/sass_includes"],
+      import_path: paths.sass_includes,
       generated_images_path: 'public/img'
     }))
+    .once('error', function(err) {
+      console.log(err);
+    })
+    .pipe(plugins.livereload());
 });
 
+gulp.task('hbs', function() {
+  gulp.src(paths.templates)
+    .pipe(plugins.livereload());
+});
+
+gulp.task('staticJS', function() {
+  gulp.src(paths.staticJS)
+    .pipe(plugins.livereload());
+});
 
 gulp.task('env:development', function() {
   process.env.NODE_ENV = 'development';
 });
 
-gulp.task('jshint', function() {
+gulp.task('debug', function() {
+  gulp.src(["server.js"])
+    .pipe(plugins.nodeInspector({
+      debugBrk: true,
+      debugPort: 5858,
+      webHost: 'localhost',
+      webPort: 1337,
+      nodejs: ["--harmony"],
+      saveLiveEdit: false,
+      preload: false,
+      inject: true,
+      hidden: [],
+      stackTraceLimit: 50,
+      sslKey: '',
+      sslCert: ''
+    }));
+});
+
+
+gulp.task('pre-test', function() {
   return gulp.src(paths.js)
-    .pipe(plugins.jshint())
-    .pipe(plugins.jshint.reporter('jshint-stylish'))
-    .pipe(plugins.jshint.reporter('fail'))
-    .pipe(count('jshint', 'files lint free'));
+    // Covering files
+    .pipe(plugins.istanbul())
+    // Force `require` to return covered files
+    .pipe(plugins.istanbul.hookRequire());
 });
 
-gulp.task('csslint', function() {
-  return gulp.src(paths.css)
-    .pipe(plugins.csslint('.csslintrc'))
-    .pipe(plugins.csslint.reporter())
-    .pipe(count('csslint', 'files lint free'));
+gulp.task('unit-test', function() {
+  return gulp.src(paths.unitTest, {
+      read: false
+    })
+    .pipe(plugins.mocha({
+      reporter: 'Spec',
+      bail: true,
+      timeout: 1000
+    }))
+    .once('error', function(err) {
+      console.log(err);
+    })
+    .once('end', function() {
+      process.exit();
+    });
 });
 
-gulp.task('server', ['env:development'], function() {
+gulp.task('server', function() {
   plugins.nodemon({
     script: 'server.js',
-    ext: "*.js",
-    watch: ['lib', ".", "apps/{controllers,models,routes}"],
+    watch: paths.js,
     env: {
       'NODE_ENV': 'development',
       'PORT': 9000
     },
     ignore: ['node_modules/'],
-    nodeArgs: ['--debug', '--es_staging']
+    nodeArgs: ['--debug', '--es_staging', '--harmony']
   });
 });
 
+gulp.task('dev-server', ['debug', 'server', 'watch', 'compass']);
+
 gulp.task('watch', function() {
-  gulp.watch(paths.js, ['jshint']).on('change', plugins.livereload.changed);
-  gulp.watch(paths.template).on('change', plugins.livereload.changed);
-  gulp.watch(paths.css, ['csslint']).on('change', plugins.livereload.changed);
-  gulp.watch(paths.sass, ['sass']).on('change', plugins.livereload.changed);
   plugins.livereload.listen({
     interval: 500
   });
+  gulp.watch(paths.staticJS, ['staticJS']);
+  gulp.watch(paths.sass, ['compass']);
+  gulp.watch(paths.templates, ['hbs']);
 });
-
-function count(taskName, message) {
-  var fileCount = 0;
-
-  function countFiles(file) {
-    fileCount++; // jshint ignore:line
-  }
-
-  function endStream() {
-    gutil.log(gutil.colors.cyan(taskName + ': ') + fileCount + ' ' + message || 'files processed.');
-    this.emit('end'); // jshint ignore:line
-  }
-  return through(countFiles, endStream);
-}
-
-gulp.task('development', defaultTasks);
