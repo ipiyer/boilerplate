@@ -1,0 +1,10 @@
+---
+- name: Install global npm
+  npm: name={{ item }} global=yes
+  with_items:
+    - gulp
+    - bower
+    - knex
+
+- name: Install app dependencies
+  npm: path=/home/vagrant/application

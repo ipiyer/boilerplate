@@ -1,0 +1,4 @@
+ANXS.build-essential,v1.0.1
+ANXS.apt,v1.2.0
+mrlesmithjr.nodejs
+ANXS.postgresql

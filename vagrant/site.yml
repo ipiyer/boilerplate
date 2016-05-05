@@ -1,0 +1,36 @@
+- name: Dev box setup for NodeJS
+  hosts: vagrant
+  become: yes
+  become_method: sudo
+  roles:
+    - apt
+    - ANXS.build-essential
+    - {role: mrlesmithjr.nodejs, nodejs_version: '5.x'}
+    - sass-compass
+    - node-env
+    - role: ANXS.postgresql
+      postgresql_version: 9.5
+      postgresql_encoding: 'UTF-8'
+      postgresql_locale: 'en_US.UTF-8'
+      postgresql_admin_user: "postgres"
+      postgresql_default_auth_method: "trust"
+      postgresql_cluster_name: "main"
+      postgresql_cluster_reset: false
+      postgresql_databases:
+        - name: application
+          owner: app_user          # optional; specify the owner of the database
+          hstore: no         # flag to install the hstore extension on this database (yes/no)
+          uuid_ossp: no      # flag to install the uuid-ossp extension on this database (yes/no)
+          citext: no
+
+      postgresql_users:
+        - name: app_user
+          pass: pass
+          encrypted: no       # denotes if the password is already encrypted.
+
+      # List of user privileges to be applied (optional)
+      postgresql_user_privileges:
+        - name: app_user                   # user name
+          db: application                  # database
+          priv: "ALL"                 # privilege string format: example: INSERT,UPDATE/table:SELECT/anothertable:ALL
+          role_attr_flags: "CREATEDB" # role attribute flags

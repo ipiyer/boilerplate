@@ -2,14 +2,13 @@
 
 var gulp = require('gulp'),
   gulpLoadPlugins = require('gulp-load-plugins'),
-  through = require('through2'),
   gutil = require('gulp-util'),
   plugins = gulpLoadPlugins(),
 
   compass = require("gulp-compass"),
   paths = {
     js: ['./*.js', '!node_modules/**', '!public/js/**',
-      'config/**/*.js', 'apps/{controllers,middleware,models,routes}/**/*.js',
+      'config/**/*.js', 'apps/{controllers,middleware,model,routes}/**/*.js',
       'lib/**', 'utils/**/*.js'
     ],
     staticJS: ['public/js/*.js'],
@@ -106,6 +105,7 @@ gulp.task('unit-test', function() {
 gulp.task('server', function() {
   plugins.nodemon({
     script: 'server.js',
+    legacyWatch: true,
     watch: paths.js,
     env: {
       'NODE_ENV': 'development',
@@ -118,11 +118,21 @@ gulp.task('server', function() {
 
 gulp.task('dev-server', ['debug', 'server', 'watch', 'compass']);
 
+
 gulp.task('watch', function() {
   plugins.livereload.listen({
     interval: 500
   });
-  gulp.watch(paths.staticJS, ['staticJS']);
-  gulp.watch(paths.sass, ['compass']);
-  gulp.watch(paths.templates, ['hbs']);
+
+  gulp.watch(paths.staticJS, {
+    usePolling: true
+  }, ['staticJS']);
+
+  gulp.watch(paths.sass, {
+    usePolling: true
+  }, ['compass']);
+
+  gulp.watch(paths.templates, {
+    usePolling: true
+  }, ['hbs']);
 });

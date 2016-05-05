@@ -1,0 +1,32 @@
+---
+- name: Install ruby
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+    - git-core
+    - curl
+    - zlib1g-dev
+    - build-essential
+    - libssl-dev
+    - libreadline-dev
+    - libyaml-dev
+    - libsqlite3-dev
+    - sqlite3
+    - libxml2-dev
+    - libxslt1-dev
+    - libcurl4-openssl-dev
+    - python-software-properties
+    - libgdbm-dev
+    - libncurses5-dev
+    - automake
+    - libtool
+    - bison
+    - libffi-dev
+    - ruby
+    - ruby-dev
+
+
+
+- name: Install compass
+  become: yes
+  become_method: sudo
+  shell: gem install compass

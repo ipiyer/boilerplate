@@ -1,0 +1,1 @@
+{"virtualbox":{"/app":{"guestpath":"/app","hostpath":"/Users/prashanth","disabled":false},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/prashanth/node-dev-box","disabled":false}}}
